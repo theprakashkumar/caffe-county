@@ -1,0 +1,40 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Auth API",
+    "description": "API for authentication."
+  },
+  "host": "localhost:6001",
+  "basePath": "/",
+  "schemes": ["http"],
+  "paths": {
+    "/signup": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "Prakash"
+                },
+                "email": {
+                  "example": "prakashcodes@outlook.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}
