@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorMiddleware } from "../../../packages/error-handler/errorHandlerMiddleware";
+import authRouter from "./routes/auth.router";
 const app = express();
 
 app.use(express.json());
@@ -14,11 +15,14 @@ app.use(
   })
 );
 
-app.use(errorMiddleware);
+//Routes
+app.use("/api", authRouter);
 
 app.get("/", (req, res) => {
   res.send({ message: "Hello Auth Service" });
 });
+
+app.use(errorMiddleware);
 
 const port = process.env.PORT || 6001;
 const server = app.listen(port, () => {

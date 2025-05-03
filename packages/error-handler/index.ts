@@ -13,6 +13,9 @@ export class AppError extends Error {
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     this.details = details;
+    // This line captures the current stack trace and attaches it to this error instance.
+    // It preserves the proper call stack information, making debugging easier by
+    // showing where the error was originally thrown from rather than where the Error class was defined.
     Error.captureStackTrace(this);
   }
 }
@@ -26,7 +29,7 @@ export class NotFoundError extends AppError {
 
 // Validation Error
 export class ValidationError extends AppError {
-  constructor(message = "Invalid request data", details: any) {
+  constructor(message = "Invalid request data", details?: any) {
     super(message, 422, true, details);
   }
 }
