@@ -9,7 +9,7 @@
   "basePath": "/",
   "schemes": ["http"],
   "paths": {
-    "/signup": {
+    "api/signup": {
       "post": {
         "description": "",
         "parameters": [

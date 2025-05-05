@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { errorMiddleware } from "../../../packages/error-handler/errorHandlerMiddleware";
+import { errorMiddleware } from "@packages/error-handler/errorHandlerMiddleware";
 import authRouter from "./routes/auth.router";
 import swaggerUi from "swagger-ui-express";
 const swaggerDocument = require("./swagger.json");
