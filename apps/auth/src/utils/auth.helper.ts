@@ -1,9 +1,9 @@
 import crypto from "crypto";
-import { Request, NextFunction } from "express";
+import { Request, NextFunction, Response } from "express";
 import { ValidationError } from "@packages/error-handler";
 import redis from "@packages/libs/redis";
 import { sendEmail } from "./sendEmail";
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isValidEmail } from "@packages/libs/validation";
 
 export const validateRegistrationData = async (
   req: Request,
@@ -20,7 +20,7 @@ export const validateRegistrationData = async (
     throw new ValidationError("All fields are required");
   }
   // Validate email
-  if (!emailRegex.test(email)) {
+  if (!isValidEmail(email)) {
     throw new ValidationError("Invalid email address");
   }
 };
@@ -124,4 +124,21 @@ export const validateOtp = async (
   // delete the OTP from Redis
   await redis.del(`otp:${email}`, failedAttemptKey);
   return true;
+};
+
+export const verifyForgotPasswordOtp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp)
+      throw new ValidationError("Email and OTP are required!");
+    await validateOtp(email, otp, next);
+
+    res.status(200).json({ message: "OTP verified." });
+  } catch (error) {
+    next(error);
+  }
 };

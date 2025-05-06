@@ -5,12 +5,14 @@ import {
   trackOtpRequest,
   validateOtp,
   validateRegistrationData,
+  verifyForgotPasswordOtp,
 } from "../utils/auth.helper";
 import { AuthError, ValidationError } from "@packages/error-handler";
 import prisma from "@packages/libs/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { setCookie } from "../utils/cookies/setCookies";
+import { isValidEmail } from "@packages/libs/validation";
 
 // Register a new User
 
@@ -82,9 +84,13 @@ export const login = async (
 ) => {
   try {
     const { email, password } = req.body;
-
+    // Validation
     if (!email || !password) {
       return next(new ValidationError("Email and password are required!"));
+    }
+
+    if (!isValidEmail(email)) {
+      return next(new ValidationError("Email is not valid!"));
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
@@ -120,5 +126,97 @@ export const login = async (
     });
   } catch (error: any) {
     return next(error);
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email } = req.body;
+
+    // Validation
+    if (!email) {
+      return next(new ValidationError("Email is required!"));
+    }
+
+    if (!isValidEmail(email)) {
+      return next(new ValidationError("Email is not valid!"));
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return next(new AuthError("User not found!"));
+    }
+
+    // Check OTP restrictions
+    await checkOtpRestriction(email, next);
+    await trackOtpRequest(email, next);
+    await sendOtp(user.name, email, "password-reset-mail");
+
+    res.status(201).json({
+      message: "Sent OTP to the registered email.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyResetPassword = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  verifyForgotPasswordOtp(req, res, next);
+};
+
+export const updatePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, password, otp } = req.body;
+
+    if (!email || !password || !otp) {
+      return next(new ValidationError("Didn't get all fields!"));
+    }
+
+    if (!isValidEmail(email)) {
+      return next(new ValidationError("Email is not valid!"));
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      return next(new AuthError("User not found!"));
+    }
+
+    // Validate OTP before proceeding
+    await validateOtp(email, otp, next);
+
+    const isSamePassword = await bcrypt.compare(password, user.password!);
+    if (isSamePassword) {
+      return next(
+        new ValidationError("Password must be different than old one.")
+      );
+    }
+
+    const hashedNewPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { email },
+      data: {
+        password: hashedNewPassword,
+      },
+    });
+
+    res.status(200).json({
+      message: "Password has been updated!",
+    });
+  } catch (error) {
+    next(error);
   }
 };
