@@ -5,11 +5,13 @@
     "title": "Auth API",
     "description": "API for authentication."
   },
-  "host": "localhost:6001",
+  "host": "localhost:6001/api",
   "basePath": "/",
-  "schemes": ["http"],
+  "schemes": [
+    "http"
+  ],
   "paths": {
-    "api/signup": {
+    "/signup": {
       "post": {
         "description": "",
         "parameters": [
@@ -20,10 +22,10 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "example": "Prakash"
+                  "example": "any"
                 },
                 "email": {
-                  "example": "prakashcodes@outlook.com"
+                  "example": "any"
                 }
               }
             }
@@ -32,6 +34,39 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/verify": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "otp": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "name": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
           }
         }
       }

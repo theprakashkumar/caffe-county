@@ -6,7 +6,7 @@ const doc = {
     title: "Auth API",
     description: "API for authentication.",
   },
-  host: "localhost:6001",
+  host: "localhost:6001/api",
   schemes: ["http"],
 };
 
