@@ -6,9 +6,11 @@ import {
   validateOtp,
   validateRegistrationData,
 } from "../utils/auth.helper";
-import { ValidationError } from "@packages/error-handler";
+import { AuthError, ValidationError } from "@packages/error-handler";
 import prisma from "@packages/libs/prisma";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { setCookie } from "../utils/cookies/setCookies";
 
 // Register a new User
 
@@ -68,9 +70,54 @@ export const verifyUser = async (
       message: "User created successfully",
       user: newUser,
     });
+  } catch (error: any) {
+    return next(error);
+  }
+};
 
-    // if not, verify the user
-    // if yes, return the user
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return next(new ValidationError("Email and password are required!"));
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return next(new AuthError("User not found!"));
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password!);
+    if (!isPasswordMatch) {
+      return next(new AuthError("Invalid email or password!"));
+    }
+    // Generate a new user token.
+    const accessToken = jwt.sign(
+      { id: user.id, role: "user" },
+      process.env.ACCESS_TOKEN_SECRET!,
+      { expiresIn: "15m" }
+    );
+    // Refresh token.
+    const refreshToken = jwt.sign(
+      { id: user.id, role: "user" },
+      process.env.REFRESH_TOKEN_SECRET!,
+      { expiresIn: "7d" }
+    );
+    // Send token
+    setCookie(res, "refresh_token", refreshToken);
+    setCookie(res, "access_token", accessToken);
+
+    res.status(200).json({
+      message: "Login successful!",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
   } catch (error: any) {
     return next(error);
   }
