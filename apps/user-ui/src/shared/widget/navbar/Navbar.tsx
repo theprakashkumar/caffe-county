@@ -18,9 +18,9 @@ const Navbar: FC = () => {
           <section className="flex">
             <input
               type="text"
-              className="block w-64 border border-slate-600 rounded-l-md my-2 p-2 "
+              className="block w-64 border border-slate-600 rounded-l-md my-3 p-1.5 outline-none"
             />
-            <button className="bg-slate-900 my-2 px-2 rounded-r-md">
+            <button className="bg-slate-900 my-3 px-2 rounded-r-md">
               <Search className="text-slate-50" />
             </button>
           </section>
@@ -30,10 +30,16 @@ const Navbar: FC = () => {
               <User />
               <p>Login</p>
             </span>
-            <Link href={"/cart"} className="ml-4">
+            <Link href={"/cart"} className="ml-4 relative ">
+              <span className="absolute top-[-6px] right-[-4px] bg-slate-900 text-slate-50 p-1 rounded-full leading-[12px] text-xs">
+                0
+              </span>
               <ShoppingCart />
             </Link>
-            <Link href={"/wishlist"}>
+            <Link href={"/wishlist"} className="relative">
+              <span className="absolute top-[-6px] right-[-4px] bg-slate-900 text-slate-50 p-1 rounded-full leading-[12px] text-xs">
+                0
+              </span>
               <Heart />
             </Link>
           </span>
