@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={lato.className}>
+    <html lang="en" className={`${lato.className} bg-gray-50`}>
       <body>
         <Navbar />
         {children}
