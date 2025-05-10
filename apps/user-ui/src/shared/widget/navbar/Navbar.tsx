@@ -1,4 +1,4 @@
-import { navbarLinks } from "apps/user-ui/src/app/configs/constants";
+import { navbarLinks } from "apps/user-ui/src/configs/constants";
 import { pacifico } from "apps/user-ui/src/app/fonts";
 import { Heart, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
@@ -50,7 +50,9 @@ const Navbar: FC = () => {
       <div className="bg-white w-full">
         <div className="w-max mx-auto flex p-2 gap-6 text-lg">
           {navbarLinks.map((link) => (
-            <Link href={link.route}>{link.title}</Link>
+            <Link href={link.route} key={link.title}>
+              {link.title}
+            </Link>
           ))}
         </div>
       </div>
