@@ -4,31 +4,29 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-interface LoginInput {
+interface SignupInput {
+  name: string;
   email: string;
   password: string;
 }
 
-const Login = () => {
+const Signup = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginInput>();
+  } = useForm<SignupInput>();
 
-  const onSubmit = (data: LoginInput) => {
+  const onSubmit = (data: SignupInput) => {
     console.log(data);
   };
 
   const [showPassword, setShowPassword] = useState<Boolean>(false);
   return (
     <div className="mx-auto w-full max-w-[400px] bg-white rounded-md p-4 mt-20">
-      <h1 className="text-center text-2xl font-bold">Login</h1>
-      <h4 className="text-subtext mt-2 text-sm">
-        Choose between 100+ products across many category
-      </h4>
+      <h1 className="text-center text-2xl font-bold">Signup</h1>
       <button className="bg-main text-background mt-4 rounded-md w-full py-2">
-        Login with Google
+        Singup with Google
       </button>
       <div>
         <div className="flex my-2 justify-between items-center">
@@ -38,6 +36,18 @@ const Login = () => {
         </div>
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex flex-col">
+          <label>Name</label>
+          <input
+            type="text"
+            className="rounded-md w-full p-2 my-2 bg-background"
+            placeholder="name"
+            {...register("name", {
+              required: "Name is required!",
+            })}
+          />
+          {errors.name && <p className="text-warning">{errors.name.message}</p>}
+        </div>
         <div className="flex flex-col">
           <label>Email</label>
           <input
@@ -84,9 +94,6 @@ const Login = () => {
             <input id="remember" type="checkbox" className="mr-1" />
             <label htmlFor="remember">Remember </label>
           </span>
-          <Link href="forget-password" className="text-link">
-            Forget Password
-          </Link>
         </div>
 
         <button
@@ -95,11 +102,11 @@ const Login = () => {
         >
           Login
         </button>
-        <Link href="/signup" className="text-link flex justify-center">
-          Don't have account? Sign up
+        <Link href="/login" className="text-link flex justify-center">
+          Already have an account? Login
         </Link>
       </form>
     </div>
   );
 };
-export default Login;
+export default Signup;
