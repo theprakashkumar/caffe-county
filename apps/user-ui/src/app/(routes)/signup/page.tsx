@@ -1,4 +1,6 @@
 "use client";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -11,8 +13,10 @@ interface SignupInput {
 }
 
 const Signup = () => {
-  const [showOTPScreen, setShowOTPScreen] = useState<Boolean>(true);
+  const [showOTPScreen, setShowOTPScreen] = useState<boolean>(false);
   const [OTP, setOTP] = useState(Array(4).fill(""));
+  const [disableResend, setDisableResend] = useState<boolean>(false);
+  const [secondLeftToEnable, setSecondLeftToEnable] = useState<number>(0);
   const ref = useRef<HTMLElement[]>([]);
 
   const handleOTPChange = (e: any, index: number) => {
@@ -44,8 +48,42 @@ const Signup = () => {
     formState: { errors },
   } = useForm<SignupInput>();
 
-  const onSubmit = (data: SignupInput) => {
-    console.log(data);
+  // Timer countdown to resend the OTP after 60 seconds.
+  const startTimer = () => {
+    const timer = setInterval(() => {
+      setSecondLeftToEnable((prevSeconds) => {
+        if (prevSeconds <= 1) {
+          clearInterval(timer);
+          setDisableResend(false);
+          return 0;
+        }
+        return prevSeconds - 1;
+      });
+    }, 1000);
+  };
+
+  const signupMutation = useMutation({
+    mutationFn: async (data: SignupInput) => {
+      const response = await axios.post("http://localhost:8080/api/signup", {
+        name: data.name,
+        email: data.email,
+        password: data.email,
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      setShowOTPScreen(true);
+      setDisableResend(true);
+      setSecondLeftToEnable(60);
+      startTimer();
+    },
+    onError: (error) => {
+      console.log("some", error);
+    },
+  });
+
+  const submit = async (data: SignupInput) => {
+    signupMutation.mutate(data);
   };
 
   const [showPassword, setShowPassword] = useState<Boolean>(false);
@@ -64,7 +102,7 @@ const Signup = () => {
       </div>
       {!showOTPScreen ? (
         <>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(submit)}>
             <div className="flex flex-col">
               <label>Name</label>
               <input
@@ -125,7 +163,7 @@ const Signup = () => {
               type="submit"
               className="bg-main text-background my-2 rounded-md w-full py-2"
             >
-              Signup
+              {signupMutation.isPending ? "Signing up" : "Sign up"}
             </button>
           </form>
           <Link href="/login" className="text-link flex justify-center">
@@ -155,8 +193,11 @@ const Signup = () => {
           <button className="bg-main text-background mt-4 rounded-md w-full py-2">
             Submit
           </button>
-          <button className="block mt-2 mx-auto w-fit text-link">
-            Resend OTP?
+          <button
+            className="block mt-2 mx-auto w-fit text-link disabled:cursor-not-allowed"
+            disabled={disableResend}
+          >
+            {disableResend ? `Resend in ${secondLeftToEnable}` : "Resend"}
           </button>
         </>
       )}

@@ -1,5 +1,6 @@
 import Navbar from "../shared/widget/navbar/Navbar";
 import { lato } from "./fonts";
+import Provider from "./providers";
 import "./global.css";
 
 export const metadata = {
@@ -14,10 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${lato.className} bg-gray-50`}>
-      <body>
-        <Navbar />
-        {children}
-      </body>
+      <Provider>
+        <body>
+          <Navbar />
+          {children}
+        </body>
+      </Provider>
     </html>
   );
 }
