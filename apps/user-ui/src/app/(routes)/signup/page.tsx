@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -17,7 +18,13 @@ const Signup = () => {
   const [OTP, setOTP] = useState(Array(4).fill(""));
   const [disableResend, setDisableResend] = useState<boolean>(false);
   const [secondLeftToEnable, setSecondLeftToEnable] = useState<number>(0);
+  const [signupInfo, setSignupInfo] = useState<SignupInput>({
+    name: "",
+    email: "",
+    password: "",
+  });
   const ref = useRef<HTMLElement[]>([]);
+  const router = useRouter();
 
   const handleOTPChange = (e: any, index: number) => {
     const inputtedKey = e.key;
@@ -64,10 +71,19 @@ const Signup = () => {
 
   const signupMutation = useMutation({
     mutationFn: async (data: SignupInput) => {
-      const response = await axios.post("http://localhost:8080/api/signup", {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/signup`,
+        {
+          name: data.name,
+          email: data.email,
+          password: data.email,
+        }
+      );
+      // Update the local state.
+      setSignupInfo({
         name: data.name,
         email: data.email,
-        password: data.email,
+        password: data.password,
       });
       return response.data;
     },
@@ -82,8 +98,31 @@ const Signup = () => {
     },
   });
 
+  const verifyOTPMutation = useMutation({
+    mutationFn: async (otp: string) => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/verify-signup`,
+        {
+          name: signupInfo.name,
+          email: signupInfo.email,
+          password: signupInfo.email,
+          otp,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      router.push("/login");
+    },
+  });
+
   const submit = async (data: SignupInput) => {
     signupMutation.mutate(data);
+  };
+
+  const submitOTP = () => {
+    const otp = OTP.join("");
+    verifyOTPMutation.mutate(otp);
   };
 
   const [showPassword, setShowPassword] = useState<Boolean>(false);
@@ -108,7 +147,7 @@ const Signup = () => {
               <input
                 type="text"
                 className="rounded-md w-full p-2 my-2 bg-background"
-                placeholder="name"
+                placeholder="Name"
                 {...register("name", {
                   required: "Name is required!",
                 })}
@@ -166,9 +205,12 @@ const Signup = () => {
               {signupMutation.isPending ? "Signing up" : "Sign up"}
             </button>
           </form>
-          <Link href="/login" className="text-link flex justify-center">
-            Already have an account? Login
-          </Link>
+          <p className="flex justify-center">
+            Already have an account?
+            <Link href="/login" className="text-link ml-1">
+              Login
+            </Link>
+          </p>
         </>
       ) : (
         <>
@@ -190,7 +232,10 @@ const Signup = () => {
               />
             ))}
           </div>
-          <button className="bg-main text-background mt-4 rounded-md w-full py-2">
+          <button
+            className="bg-main text-background mt-4 rounded-md w-full py-2"
+            onClick={submitOTP}
+          >
             Submit
           </button>
           <button

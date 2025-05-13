@@ -95,9 +95,12 @@ const Login = () => {
         >
           Login
         </button>
-        <Link href="/signup" className="text-link flex justify-center">
-          Don't have account? Sign up
-        </Link>
+        <p className="flex justify-center">
+          Don't have account?
+          <Link href="/signup" className="text-link ml-1">
+            Sign up
+          </Link>
+        </p>
       </form>
     </div>
   );
