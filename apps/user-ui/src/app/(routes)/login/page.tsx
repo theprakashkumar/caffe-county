@@ -1,6 +1,9 @@
 "use client";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -10,14 +13,27 @@ interface LoginInput {
 }
 
 const Login = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginInput>();
 
-  const onSubmit = (data: LoginInput) => {
-    console.log(data);
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginInput) => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
+        { email: data.email, password: data.password }
+      );
+    },
+    onSuccess: () => {
+      router.push("/");
+    },
+  });
+
+  const submit = (data: LoginInput) => {
+    loginMutation.mutate(data);
   };
 
   const [showPassword, setShowPassword] = useState<Boolean>(false);
@@ -37,7 +53,7 @@ const Login = () => {
           <hr className="text-subtext w-full bg block" />
         </div>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(submit)}>
         <div className="flex flex-col">
           <label>Email</label>
           <input
