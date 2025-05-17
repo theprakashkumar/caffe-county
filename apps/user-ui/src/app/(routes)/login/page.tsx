@@ -4,7 +4,7 @@ import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface LoginInput {
@@ -14,6 +14,13 @@ interface LoginInput {
 
 const Login = () => {
   const router = useRouter();
+  const [loginData, setLoginData] = useState<LoginInput>({
+    email: "",
+    password: "",
+  });
+  const [rememberLoginCredential, setRememberLoginCredential] =
+    useState<boolean>(false);
+
   const {
     register,
     handleSubmit,
@@ -28,15 +35,26 @@ const Login = () => {
       );
     },
     onSuccess: () => {
+      if (rememberLoginCredential) {
+        localStorage.setItem("loginCredential", JSON.stringify(loginData));
+      }
       router.push("/");
     },
   });
 
   const submit = (data: LoginInput) => {
+    setLoginData(data);
     loginMutation.mutate(data);
   };
 
   const [showPassword, setShowPassword] = useState<Boolean>(false);
+
+  useEffect(() => {
+    const data = localStorage.getItem("loginCredential");
+    if (data) {
+      const parsedData = JSON.parse(data);
+    }
+  }, []);
   return (
     <div className="mx-auto w-full max-w-[400px] bg-white rounded-md p-4 mt-20">
       <h1 className="text-center text-2xl font-bold">Login</h1>
@@ -97,11 +115,19 @@ const Login = () => {
         </div>
         <div className="flex justify-between">
           <span>
-            <input id="remember" type="checkbox" className="mr-1" />
+            <input
+              id="remember"
+              type="checkbox"
+              className="mr-1"
+              checked={rememberLoginCredential}
+              onChange={() =>
+                setRememberLoginCredential(!rememberLoginCredential)
+              }
+            />
             <label htmlFor="remember">Remember </label>
           </span>
-          <Link href="forget-password" className="text-link">
-            Forget Password
+          <Link href="/forgot-password" className="text-link">
+            Forgot Password
           </Link>
         </div>
 

@@ -121,8 +121,6 @@ export const validateOtp = async (
     );
   }
 
-  // delete the OTP from Redis
-  await redis.del(`otp:${email}`, failedAttemptKey);
   return true;
 };
 

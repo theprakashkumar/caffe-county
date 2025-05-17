@@ -76,7 +76,7 @@ const Signup = () => {
         {
           name: data.name,
           email: data.email,
-          password: data.email,
+          password: data.password,
         }
       );
       // Update the local state.
