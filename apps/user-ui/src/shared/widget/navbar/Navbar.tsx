@@ -1,10 +1,14 @@
+"use client";
 import { navbarLinks } from "apps/user-ui/src/configs/constants";
 import { pacifico } from "apps/user-ui/src/app/fonts";
 import { Heart, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { FC } from "react";
+import useUser from "apps/user-ui/src/hooks/useUser";
 
 const Navbar: FC = () => {
+  const { user, isLoading } = useUser();
+  console.log("user", user);
   return (
     <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="w-[90%] flex justify-between align-center justify-self-center">
@@ -28,10 +32,14 @@ const Navbar: FC = () => {
           </button> */}
           </section>
           <span className="flex gap-2 items-center">
-            <span className="flex gap-2">
-              <User />
-              <p>Login</p>
-            </span>
+            {user ? (
+              <span className="flex gap-2">
+                <User />
+                <p>{user?.name}</p>
+              </span>
+            ) : (
+              <Link href={"/login"}>Login</Link>
+            )}
             <Link href={"/cart"} className=" relative ">
               <span className="absolute top-[-6px] right-[-4px] bg-slate-900 text-slate-50 p-1 rounded-full leading-[12px] text-xs">
                 0

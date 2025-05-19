@@ -31,7 +31,8 @@ const Login = () => {
     mutationFn: async (data: LoginInput) => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
-        { email: data.email, password: data.password }
+        { email: data.email, password: data.password },
+        { withCredentials: true }
       );
     },
     onSuccess: () => {
