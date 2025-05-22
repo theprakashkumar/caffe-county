@@ -12,12 +12,20 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './{src,pages,components,app}/**/*.{ts,tsx,js,jsx,html}',
-    '!./{src,pages,components,app}/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
-//     ...createGlobPatternsForDependencies(__dirname)
+    "./{src,pages,components,app}/**/*.{ts,tsx,js,jsx,html}",
+    "!./{src,pages,components,app}/**/*.{stories,spec}.{ts,tsx,js,jsx,html}",
+    //     ...createGlobPatternsForDependencies(__dirname)
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        main: "#0f172a", // slate-900 color code
+        background: "#f8fafc", // slate-50 color code
+        subtext: "#475569", // slate-600 color code
+        link: "#3b82f6", // blue-500 color code
+        warning: "#ef4444", // red-500 color code
+      },
+    },
   },
   plugins: [],
 };
