@@ -24,6 +24,7 @@ module.exports = {
         subtext: "#475569", // slate-600 color code
         link: "#3b82f6", // blue-500 color code
         warning: "#ef4444", // red-500 color code
+        success: "#22c55e", // green-500 color code
       },
     },
   },
