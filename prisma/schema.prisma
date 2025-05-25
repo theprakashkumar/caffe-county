@@ -19,19 +19,67 @@ model Image {
   file_id String
   url     String
   userId  String? @unique @db.ObjectId
+  shopId  String? @unique @db.ObjectId
   user    User?   @relation(fields: [userId], references: [id])
+  shops   Shops[]
 }
 
 model User {
   // - @map("_id"): Maps this field to the "_id" field in the MongoDB collection
   // - @db.ObjectId: Specifies that this field is a MongoDB ObjectId type
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String        @unique
+  password    String?
+  following   String[]
+  avatar      Image?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  ShopReviews ShopReviews[]
+}
+
+model ShopReviews {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  email     String   @unique
-  password  String?
-  following String[]
-  avatar    Image?
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Float
+  reviews   String?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  imageId   String?  @db.ObjectId
+  updateAt  DateTime @updatedAt
+  shop      Shops?   @relation(fields: [shopId], references: [id])
+  shopId    String?  @db.ObjectId
+}
+
+model Shops {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  bio          String?
+  category     String
+  avatar       Image?        @relation(fields: [imageId], references: [id])
+  coverBanner  String?
+  address      String
+  openingHours String?
+  website      String?
+  socialLinks  Json[]
+  rating       Float         @default(0)
+  reviews      ShopReviews[]
+  sellerId     String        @unique @db.ObjectId
+  seller       Seller        @relation(fields: [sellerId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  imageId      String?       @db.ObjectId
+}
+
+model Seller {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String   @unique
+  phone    String
+  country  String
+  password String
+  stripeId String?
+  shop     Shops?
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  shopId   String?  @db.ObjectId
 }

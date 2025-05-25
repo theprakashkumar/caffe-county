@@ -9,13 +9,14 @@ export const validateRegistrationData = async (
   req: Request,
   userType: "user" | "seller"
 ) => {
-  const { name, email, password, phoneNumber, country } = req.body;
+  console.log(req.body);
+  const { name, email, password, phone, country } = req.body;
   // Validate if we have all the required fields
   if (
     !name ||
     !email ||
     !password ||
-    (userType === "seller" && (!phoneNumber || !country))
+    (userType === "seller" && (!phone || !country))
   ) {
     throw new ValidationError("All fields are required");
   }

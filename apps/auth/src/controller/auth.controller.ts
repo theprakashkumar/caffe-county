@@ -203,6 +203,7 @@ export const resetPassword = async (
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
+
     if (!user) {
       return next(new AuthError("User not found!"));
     }
@@ -276,3 +277,112 @@ export const updatePassword = async (
     next(error);
   }
 };
+
+// Register Seller
+export const registerSeller = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    validateRegistrationData(req, "seller");
+
+    const { name, email } = req.body;
+
+    const existingSeller = await prisma.seller.findUnique({ where: { email } });
+
+    if (existingSeller) {
+      return new ValidationError("Seller already exist!");
+    }
+
+    await checkOtpRestriction(email, next);
+    await trackOtpRequest(email, next);
+    await sendOtp(name, email, "seller-activation");
+
+    res
+      .status(200)
+      .json({ message: "OTP sent to email. Please verify your account." });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Verify seller with OTP.
+export const verifySeller = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Validate data before creating a new seller
+    validateRegistrationData(req, "seller");
+    const { email, otp, password, phone, country, name } = req.body;
+    // Check if user already exits.
+    const sellerAlreadyExits = await prisma.seller.findUnique({
+      where: { email },
+    });
+    if (sellerAlreadyExits) {
+      return next(new ValidationError("Seller already exists"));
+    }
+    await validateOtp(email, otp, next);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newSeller = await prisma.seller.create({
+      data: { name, email, password: hashedPassword, phone, country },
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: newSeller,
+    });
+  } catch (error: any) {
+    return next(error);
+  }
+};
+
+// Verify seller with OTP.
+export const createShop = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name, bio, address, openingHours, website, category, sellerId } =
+      req.body;
+
+    // Validation: If required data is not present then send validation error.
+    if (!name || !bio || !address || !openingHours || !category || !sellerId) {
+      return new ValidationError("All fields are required!");
+    }
+
+    const shopData = {
+      name,
+      bio,
+      address,
+      openingHours,
+      category,
+      sellerId,
+      website,
+    };
+
+    if (website && website.trim() !== "") {
+      shopData.website = website;
+    }
+
+    const shop = await prisma.shops.create({
+      data: shopData,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      shop: shop,
+    });
+  } catch (error: any) {
+    return next(error);
+  }
+};
+
+// Create Strip connect account link
