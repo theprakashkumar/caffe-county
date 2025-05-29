@@ -15,3 +15,21 @@ export const countries: Array<{ name: string; code: string; flag: string }> = [
   { name: "Russia", code: "RU", flag: "🇷🇺" },
   { name: "Mexico", code: "MX", flag: "🇲🇽" },
 ];
+
+export const storeCategories: Array<{ value: string; label: string }> = [
+  { value: "fashion", label: "Fashion & Apparel" },
+  { value: "electronics", label: "Electronics & Gadgets" },
+  { value: "home", label: "Home & Kitchen" },
+  { value: "beauty", label: "Beauty & Personal Care" },
+  { value: "sports", label: "Sports & Outdoors" },
+  { value: "books", label: "Books & Stationery" },
+  { value: "toys", label: "Toys & Games" },
+  { value: "food", label: "Food & Beverages" },
+  { value: "health", label: "Health & Wellness" },
+  { value: "jewelry", label: "Jewelry & Accessories" },
+  { value: "automotive", label: "Automotive & Parts" },
+  { value: "art", label: "Art & Crafts" },
+  { value: "pet", label: "Pet Supplies" },
+  { value: "garden", label: "Garden & Outdoor" },
+  { value: "office", label: "Office Supplies" },
+];

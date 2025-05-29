@@ -1,6 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
 import { countries } from "apps/seller-ui/src/config/constant";
+import CreateShop from "apps/seller-ui/src/shared/modules/auth/CreateShop";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
@@ -11,7 +12,7 @@ import { useForm } from "react-hook-form";
 interface SignupInput {
   name: string;
   email: string;
-  phone: number | null;
+  phone: number | string | null;
   country: string;
   password: string;
 }
@@ -31,7 +32,6 @@ const Signup = () => {
     password: "",
   });
   const ref = useRef<HTMLElement[]>([]);
-  const router = useRouter();
 
   const handleOTPChange = (e: any, index: number) => {
     const inputtedKey = e.key;
@@ -60,7 +60,15 @@ const Signup = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupInput>();
+  } = useForm<SignupInput>({
+    defaultValues: {
+      name: "PK",
+      email: "supertechieyt@gmail.com",
+      phone: "9876543210",
+      country: "GB",
+      password: "1234567890",
+    },
+  });
 
   // Timer countdown to resend the OTP after 60 seconds.
   const startTimer = () => {
@@ -102,18 +110,21 @@ const Signup = () => {
   const verifyOTPMutation = useMutation({
     mutationFn: async (otp: string) => {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/verify-signup`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/verify-seller`,
         {
           name: signupInfo.name,
           email: signupInfo.email,
-          password: signupInfo.email,
+          password: signupInfo.password,
+          phone: signupInfo.phone,
+          country: signupInfo.country,
           otp,
         }
       );
       return response.data;
     },
     onSuccess: (data) => {
-      setSellerId(data?.sellerId?.id);
+      console.log("data", data);
+      setSellerId(data?.seller?.id);
       setCurrentStep(2);
     },
   });
@@ -125,6 +136,23 @@ const Signup = () => {
   const submitOTP = () => {
     const otp = OTP.join("");
     verifyOTPMutation.mutate(otp);
+  };
+
+  const connectStripe = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/create-stripe-link`,
+        { sellerId }
+      );
+
+      console.log("response", response);
+
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      }
+    } catch (error: any) {
+      console.error("Simple Connection Error:", error);
+    }
   };
 
   const [showPassword, setShowPassword] = useState<Boolean>(false);
@@ -314,6 +342,24 @@ const Signup = () => {
               </button>
             </>
           )}
+        </div>
+      )}
+
+      {currentStep === 2 && (
+        <CreateShop sellerId={sellerId} setActiveState={setCurrentStep} />
+      )}
+
+      {currentStep === 3 && (
+        <div className="mx-auto w-full max-w-[400px] bg-white rounded-md p-4">
+          <h1 className="text-center text-2xl font-bold">Connect Payment</h1>
+          <br />
+          <button
+            type="submit"
+            className="bg-main text-background my-2 rounded-md w-full py-2"
+            onClick={connectStripe}
+          >
+            Connect Strip
+          </button>
         </div>
       )}
     </>
