@@ -123,7 +123,6 @@ const Signup = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      console.log("data", data);
       setSellerId(data?.seller?.id);
       setCurrentStep(2);
     },
@@ -144,8 +143,6 @@ const Signup = () => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/create-stripe-link`,
         { sellerId }
       );
-
-      console.log("response", response);
 
       if (response.data.url) {
         window.location.href = response.data.url;

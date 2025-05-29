@@ -8,7 +8,6 @@ import useUser from "apps/user-ui/src/hooks/useUser";
 
 const Navbar: FC = () => {
   const { user, isLoading } = useUser();
-  console.log("user", user);
   return (
     <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="w-[90%] flex justify-between align-center justify-self-center">
