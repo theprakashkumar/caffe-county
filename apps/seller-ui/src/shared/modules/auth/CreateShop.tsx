@@ -36,7 +36,6 @@ const CreateShop = ({
 
   const shopCreationMutation = useMutation({
     mutationFn: async (data) => {
-      console.log(data);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/create-shop`,
         data

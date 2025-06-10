@@ -30,7 +30,7 @@ const Login = () => {
   const loginMutation = useMutation({
     mutationFn: async (data: LoginInput) => {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/login-seller`,
         { email: data.email, password: data.password },
         { withCredentials: true }
       );
