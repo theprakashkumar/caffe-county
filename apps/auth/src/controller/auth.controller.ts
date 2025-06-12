@@ -105,6 +105,10 @@ export const login = async (
     if (!isPasswordMatch) {
       return next(new AuthError("Invalid email or password!"));
     }
+
+    res.clearCookie("seller-access-token");
+    res.clearCookie("seller-refresh-token");
+
     // Generate a new user token.
     const accessToken = jwt.sign(
       { id: user.id, role: "user" },
@@ -140,7 +144,10 @@ export const refreshToken = async (
   next: NextFunction
 ) => {
   try {
-    const refreshToken = req.cookies.refresh_token;
+    const refreshToken =
+      req.cookies.redirect_token ||
+      req.cookies.seller_refresh_token ||
+      req.headers.authorization?.split(" ")[1];
 
     if (!refreshToken) {
       return new ValidationError("Unauthorized! NO refresh token!");
@@ -155,13 +162,15 @@ export const refreshToken = async (
       return new JsonWebTokenError("Forbidden! Invalid refresh token.");
     }
 
-    // let account;
+    let account;
 
-    // if(account.role === "user")
+    if (decoded.role === "user") {
+      account = await prisma.user.findUnique({ where: { id: decoded.id } });
+    } else if (decoded.role === "seller") {
+      account = await prisma.seller.findUnique({ where: { id: decoded.id } });
+    }
 
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
-
-    if (!user) {
+    if (!account) {
       return new AuthError("Forbidden! User not found.");
     }
 
@@ -171,7 +180,12 @@ export const refreshToken = async (
       { expiresIn: "15m" }
     );
 
-    setCookie(res, "access_token", newAccessToken);
+    if (decoded.role === "user") {
+      setCookie(res, "access_token", newAccessToken);
+    } else if (decoded.role === "seller") {
+      setCookie(res, "seller_access_token", newAccessToken);
+    }
+
     return res.status(201).json({ success: true });
   } catch (error) {
     return next(error);
@@ -470,6 +484,10 @@ export const loginSeller = async (
     if (!isPasswordMatch) {
       return next(new AuthError("Invalid email or password!"));
     }
+
+    res.clearCookie("access-token");
+    res.clearCookie("refresh-token");
+
     // Generate a new user token.
     const accessToken = jwt.sign(
       { id: seller.id, role: "seller" },
