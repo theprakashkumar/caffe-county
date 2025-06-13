@@ -36,13 +36,13 @@ const SideBarWrapper = () => {
           title="Order"
           href="/dashboard/order"
           icon={<ListOrdered className="text-main" />}
-          isActive={pathName === "/dashboard/order"}
+          isActive={currentActiveLink === "/dashboard/order"}
         />
         <SideBarItem
           title="Payments"
           href="/dashboard/payments"
           icon={<Wallet className="text-main" />}
-          isActive={pathName === "/dashboard/payments"}
+          isActive={currentActiveLink === "/dashboard/payments"}
         />
       </SideBarMenu>
       <SideBarMenu title="Products">
@@ -50,13 +50,13 @@ const SideBarWrapper = () => {
           title="Create Product"
           href="/dashboard/create-product"
           icon={<BadgePlus className="text-main" />}
-          isActive={pathName === "/dashboard/create-product"}
+          isActive={currentActiveLink === "/dashboard/create-product"}
         />
         <SideBarItem
           title="All Products"
           href="/dashboard/all-products"
           icon={<Box className="text-main" />}
-          isActive={pathName === "/dashboard/all-products"}
+          isActive={currentActiveLink === "/dashboard/all-products"}
         />
       </SideBarMenu>
       <SideBarMenu title="Events">
@@ -64,13 +64,13 @@ const SideBarWrapper = () => {
           title="Create Events"
           href="/dashboard/create-events"
           icon={<CalendarPlus className="text-main" />}
-          isActive={pathName === "/dashboard/create-events"}
+          isActive={currentActiveLink === "/dashboard/create-events"}
         />
         <SideBarItem
           title="All Events"
           href="/dashboard/all-events"
           icon={<BellRing className="text-main" />}
-          isActive={pathName === "/dashboard/all-events"}
+          isActive={currentActiveLink === "/dashboard/all-events"}
         />
       </SideBarMenu>
       <SideBarMenu title="Controller">
@@ -78,19 +78,19 @@ const SideBarWrapper = () => {
           title="Create Inbox"
           href="/dashboard/inbox"
           icon={<Mail className="text-main" />}
-          isActive={pathName === "/dashboard/inbox"}
+          isActive={currentActiveLink === "/dashboard/inbox"}
         />
         <SideBarItem
           title="Setting"
           href="/dashboard/setting"
           icon={<Settings className="text-main" />}
-          isActive={pathName === "/dashboard/setting"}
+          isActive={currentActiveLink === "/dashboard/setting"}
         />
         <SideBarItem
           title="Notification"
           href="/dashboard/notification"
           icon={<BellPlus className="text-main" />}
-          isActive={pathName === "/dashboard/notification"}
+          isActive={currentActiveLink === "/dashboard/notification"}
         />
       </SideBarMenu>
       <SideBarMenu title="Extra">
@@ -98,7 +98,7 @@ const SideBarWrapper = () => {
           title="Logout"
           href="/dashboard/inbox"
           icon={<LogOut className="text-main" />}
-          isActive={pathName === "/dashboard/inbox"}
+          isActive={currentActiveLink === "/dashboard/inbox"}
         />
       </SideBarMenu>
     </div>
